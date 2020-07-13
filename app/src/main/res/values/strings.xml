@@ -3,4 +3,5 @@
     <string name="mummy_image">Mummy image</string>
     <string name="playButton">playButton</string>
     <string name="zombieMan">zombieMan</string>
+    <string name="add">Add</string>
 </resources>
