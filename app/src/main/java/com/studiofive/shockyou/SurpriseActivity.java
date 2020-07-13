@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -17,6 +18,7 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import es.dmoral.toasty.Toasty;
 
 public class SurpriseActivity extends AppCompatActivity {
     @BindView(R.id.imageView)
@@ -37,6 +39,8 @@ public class SurpriseActivity extends AppCompatActivity {
 
         photoUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + File.separator + getPackageName() +"/drawable/man_1");
         soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + File.separator + getPackageName() +"/raw/scream2");
+
+        Toasty.success(this, "Success!", Toast.LENGTH_SHORT, true).show();
 
         showImage();
         playSoundClip();
