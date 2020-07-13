@@ -3,4 +3,6 @@
     <color name="colorPrimary">#D32F2F</color>
     <color name="colorPrimaryDark">#01579B</color>
     <color name="colorAccent">#5D4037</color>
+    <color name="shock_theme_color">#8E24AA</color>
+    <color name="ripple_color">#FFF176</color>
 </resources>

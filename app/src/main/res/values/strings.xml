@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">ShockYou</string>
     <string name="mummy_image">Mummy image</string>
+    <string name="playButton">playButton</string>
+    <string name="zombieMan">zombieMan</string>
 </resources>
