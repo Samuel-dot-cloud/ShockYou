@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -31,6 +32,8 @@ public class SurpriseActivity extends AppCompatActivity {
     MediaPlayer mediaPlayer;
     private Unbinder unbinder;
 
+    boolean acceptingTouches = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,10 +43,9 @@ public class SurpriseActivity extends AppCompatActivity {
         photoUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + File.separator + getPackageName() +"/drawable/man_1");
         soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + File.separator + getPackageName() +"/raw/scream2");
 
-        Toasty.success(this, "Success!", Toast.LENGTH_SHORT, true).show();
+        Toasty.success(this, "Ready!", Toast.LENGTH_SHORT, true).show();
 
-        showImage();
-        playSoundClip();
+
     }
 
     private void showImage(){
@@ -56,5 +58,21 @@ public class SurpriseActivity extends AppCompatActivity {
     private void playSoundClip(){
         mediaPlayer = MediaPlayer.create(this, soundUri);
         mediaPlayer.start();
+    }
+
+    private void userTriggeredActions(){
+        if (!acceptingTouches){
+            return;
+        }
+        acceptingTouches = false;
+
+        showImage();
+        playSoundClip();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        userTriggeredActions();
+        return super.onTouchEvent(event);
     }
 }
