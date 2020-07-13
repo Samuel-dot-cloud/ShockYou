@@ -57,6 +57,12 @@ public class SurpriseActivity extends AppCompatActivity {
 
     private void playSoundClip(){
         mediaPlayer = MediaPlayer.create(this, soundUri);
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                finish();
+            }
+        });
         mediaPlayer.start();
     }
 
