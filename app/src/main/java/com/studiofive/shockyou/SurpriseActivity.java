@@ -40,8 +40,10 @@ public class SurpriseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_surprise);
         unbinder = ButterKnife.bind(this);
 
-        photoUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + File.separator + getPackageName() +"/drawable/man_1");
-        soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + File.separator + getPackageName() +"/raw/scream2");
+        photoUri = ShockUtils.getDrawableUri(this, "man_1");
+        soundUri = ShockUtils.getRawUri(this, "scream2");
+//        photoUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + File.separator + getPackageName() +"/drawable/man_1");
+//        soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + File.separator + getPackageName() +"/raw/scream2");
 
         Toasty.success(this, "Ready!", Toast.LENGTH_SHORT, true).show();
 
