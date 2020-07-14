@@ -1,6 +1,7 @@
 package com.studiofive.shockyou;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 
 import android.app.NotificationChannel;
@@ -13,25 +14,24 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.View.OnClickListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
+
 
 public class MainActivity extends AppCompatActivity {
     @BindView(R.id.prankSurface)
-    Button mPrankSurface;
+    ConstraintLayout mPrankSurface;
 
-    private Unbinder unbinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        unbinder = ButterKnife.bind(this);
+        ButterKnife.bind(this);
 
-        mPrankSurface.setOnClickListener(new View.OnClickListener() {
+        mPrankSurface.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 createNotification();
