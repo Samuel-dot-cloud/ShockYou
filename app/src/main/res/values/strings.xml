@@ -8,4 +8,7 @@
     <string name="add_audio">Add Audio</string>
     <string name="editText">Text to speech</string>
     <string name="audio">Add Audio</string>
+    <string name="key_stored_offline_images">key_stored_offline_images</string>
+    <string name="key_photo_id">key_photo_id</string>
+
 </resources>
