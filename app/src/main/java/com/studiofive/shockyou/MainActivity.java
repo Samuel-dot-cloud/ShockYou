@@ -20,9 +20,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -61,6 +63,10 @@ public class MainActivity extends AppCompatActivity {
     AudioStorer audioStorer;
     ImageStorer imageStorer;
 
+    TextToSpeech tts;
+    MediaPlayer mediaPlayer;
+    ImageView playIcon;
+
     BroadcastReceiver updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -88,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
         audioStorer = new AudioStorer(this);
         imageStorer = new ImageStorer(this);
+        playIcon = findViewById(R.id.playIconImageView);
 
         updateUI();
         findViewById(R.id.audioSurface).setOnClickListener(new OnClickListener() {
@@ -122,6 +129,56 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        findViewById(R.id.playSurface).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AudioModel audio = audioStorer.getSelectedAudio();
+                if (audio.isTTS){
+                    final String toSpeak = audio.getDescriptionMessage();
+                    tts = new TextToSpeech(getBaseContext(), new TextToSpeech.OnInitListener() {
+                        @Override
+                        public void onInit(int status) {
+                            if (status == TextToSpeech.SUCCESS){
+                                tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+                            }
+                        }
+                    });
+                }else{
+                    //Audio clips
+                    Uri uri;
+                    if (audio.isAsset()){
+                        uri = ShockUtils.getRawUri(getBaseContext(), audio.getAudioFileName());
+                    }else{
+                        uri = Uri.fromFile(new File(audio.getAudioFileName()));
+                    }
+                    if (mediaPlayer != null){
+                        if (mediaPlayer.isPlaying()){
+                            mediaPlayer.stop();
+                            updateAudioIcon(false);
+                            return;
+                        }
+                    }
+                    mediaPlayer = MediaPlayer.create(MainActivity.this, uri);
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            updateAudioIcon(false);
+                        }
+                    });
+                    mediaPlayer.start();
+                    updateAudioIcon(true);
+                }
+            }
+        });
+    }
+
+    private void updateAudioIcon(boolean isPlaying){
+        if (isPlaying){
+            playIcon.setImageResource(R.drawable.ic_pause);
+        }else{
+            playIcon.setImageResource(R.drawable.ic_play);
+        }
     }
 
     @Override
