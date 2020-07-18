@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.app.AlertDialog;
@@ -88,6 +90,21 @@ public class MainActivity extends AppCompatActivity {
         imageStorer = new ImageStorer(this);
 
         updateUI();
+        findViewById(R.id.audioSurface).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev != null){
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+
+                AudioPickerDialogFragment dialogFragment = new AudioPickerDialogFragment();
+                dialogFragment.setCancelable(true);
+                dialogFragment.show(ft, "dialog");
+            }
+        });
     }
 
     @Override
