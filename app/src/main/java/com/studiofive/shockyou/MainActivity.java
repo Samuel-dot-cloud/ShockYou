@@ -105,6 +105,23 @@ public class MainActivity extends AppCompatActivity {
                 dialogFragment.show(ft, "dialog");
             }
         });
+
+        imageView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev != null){
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+
+                ImagePickerDialogFragment dialogFragment = new ImagePickerDialogFragment();
+                dialogFragment.setCancelable(true);
+                dialogFragment.show(ft, "dialog");
+
+            }
+        });
     }
 
     @Override
