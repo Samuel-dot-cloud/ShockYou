@@ -28,6 +28,12 @@ public class AudioStorer {
         editor.commit();
     }
 
+    public void addAudio(AudioModel audioModel){
+        List<AudioModel> audios = getStoredAudios();
+        audios.add(audioModel);
+        storedAudios(audios);
+    }
+
     private List<AudioModel> getStoredAudios(){
         String audioAsString = preferences.getString(context.getString(R.string.key_stored_audios), null);
         if (audioAsString == null || audioAsString.length() == 0){

@@ -1,6 +1,7 @@
 package com.studiofive.shockyou;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
@@ -12,6 +13,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -23,6 +26,14 @@ import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.UUID;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import es.dmoral.toasty.Toasty;
@@ -31,6 +42,12 @@ import es.dmoral.toasty.Toasty;
 public class MainActivity extends AppCompatActivity {
     @BindView(R.id.prankSurface)
     ConstraintLayout mPrankSurface;
+
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
+
+    AudioStorer audioStorer;
+    ImageStorer imageStorer;
 
 
     @Override
@@ -46,6 +63,12 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        preferences = getSharedPreferences(ShockUtils.SHOCK_SCARED_PREFS, Context.MODE_PRIVATE);
+        editor = preferences.edit();
+
+        audioStorer = new AudioStorer(this);
+        imageStorer = new ImageStorer(this);
     }
 
     @Override
@@ -108,6 +131,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addTTSAudio(String message) {
+        int mediaId = preferences.getInt(getString(R.string.key_next_media_id), ShockUtils.STARTING_ID);
+        editor.putInt(getString(R.string.key_next_media_id), mediaId + 1);
+        editor.commit();
+
+        AudioModel audioModel = new AudioModel(mediaId, message);
+        audioStorer.addAudio(audioModel);
     }
 
     private void addImageDialog() {
@@ -127,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                             Toasty.error(getBaseContext(), "Please provide appropriate input", Toast.LENGTH_SHORT, true).show();
                             return;
                         } else {
-                            downloadImage(url);
+                            downloadImageToFile(url);
                         }
                     }
                 })
@@ -135,11 +164,47 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void downloadImage(String url) {
+    private void downloadImageToFile(String url) {
+        Glide.with(this)
+                .asBitmap()
+                .load(url)
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        saveImage(resource);
+                    }
+                });
+    }
+
+    private void saveImage(Bitmap bitmap) {
+        FileOutputStream outputStream = null;
+        File file = createInternalFile(UUID.randomUUID().toString());
+        int mediaId = preferences.getInt(getString(R.string.key_next_media_id), ShockUtils.STARTING_ID);
+        editor.putInt(getString(R.string.key_next_media_id), mediaId + 1);
+        editor.commit();
+
+        ImageModel imageModel = new ImageModel(mediaId, file.getAbsolutePath(), false);
+
+        try {
+            outputStream = new FileOutputStream(new File(imageModel.getImgFilename()));
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            outputStream.close();
+
+            imageStorer.addImage(imageModel);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private File createInternalFile(String filename){
+        File outputDir = getExternalCacheDir();
+        File outputFile = new File(outputDir, filename);
+
+        return outputFile;
     }
 
     public void createNotification(){
-        String notificationMessage = "Tap to shock friends";
+        String notificationMessage = getString(R.string.tap_notification);
 
         int requestId = (int)System.currentTimeMillis();
 

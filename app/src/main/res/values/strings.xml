@@ -12,5 +12,7 @@
     <string name="key_photo_id">key_photo_id</string>
     <string name="key_stored_audios">key_stored_audios</string>
     <string name="key_audio_id">key_audio_id</string>
+    <string name="key_next_media_id">key_media_id</string>
+    <string name="tap_notification">Tap to shock friends</string>
 
 </resources>
