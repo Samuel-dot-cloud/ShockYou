@@ -22,6 +22,7 @@ public class AudioModel implements Serializable {
     public AudioModel(int id, String descriptionMessage) {
         this.id = id;
         this.descriptionMessage = descriptionMessage;
+        this.isTTS = true;
     }
 
     public int getId() {

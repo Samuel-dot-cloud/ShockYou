@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,16 +35,33 @@ public class SurpriseActivity extends AppCompatActivity {
 
     boolean acceptingTouches = true;
 
+    AudioModel audioModel;
+    ImageModel imageModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_surprise);
         unbinder = ButterKnife.bind(this);
 
-        photoUri = ShockUtils.getDrawableUri(this, "man_1");
-        soundUri = ShockUtils.getRawUri(this, "scream2");
-//        photoUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + File.separator + getPackageName() +"/drawable/man_1");
-//        soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + File.pathSeparator + File.separator + File.separator + getPackageName() +"/raw/scream2");
+        audioModel = new AudioStorer(this).getSelectedAudio();
+        imageModel = new ImageStorer(this).getSelectedImage();
+
+        //Images
+        if (imageModel.isAsset()){
+            photoUri = ShockUtils.getDrawableUri(this, imageModel.getImgFilename());
+        }else{
+            photoUri = Uri.fromFile(new File(imageModel.getImgFilename()));
+        }
+
+        //Audio
+        if (!audioModel.isTTS()){
+            if (audioModel.isAsset()){
+                soundUri = ShockUtils.getRawUri(this, audioModel.getAudioFileName());
+            }else {
+                soundUri = Uri.fromFile(new File(audioModel.getAudioFileName()));
+            }
+        }
 
         Toasty.success(this, "Ready!", Toast.LENGTH_SHORT, true).show();
 
@@ -68,6 +86,31 @@ public class SurpriseActivity extends AppCompatActivity {
         mediaPlayer.start();
     }
 
+    private void handleTTS(){
+        final String toSpeak = audioModel.getDescriptionMessage();
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS){
+                    HashMap<String, String> params = new HashMap<>();
+                    params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "stringId");
+
+                    if (status == TextToSpeech.SUCCESS){
+                        tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
+                            @Override
+                            public void onUtteranceCompleted(String utteranceId) {
+                                finish();
+                            }
+                        });
+                        tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, params);
+                    }else{
+                        finish();
+                    }
+                }
+            }
+        });
+    }
+
     private void userTriggeredActions(){
         if (!acceptingTouches){
             return;
@@ -75,7 +118,13 @@ public class SurpriseActivity extends AppCompatActivity {
         acceptingTouches = false;
 
         showImage();
-        playSoundClip();
+
+        if (audioModel.isTTS()){
+            handleTTS();
+        }else{
+            playSoundClip();
+        }
+
     }
 
     @Override
