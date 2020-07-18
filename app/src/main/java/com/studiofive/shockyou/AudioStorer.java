@@ -51,6 +51,8 @@ public class AudioStorer {
         audios.add(new AudioModel(0, "Scream 2", "scream2", true));
         audios.add(new AudioModel(1, "Behind You", "behind_you", true));
         audios.add(new AudioModel(2, "Watching You", "watching_you", true));
+        audios.add(new AudioModel(3, "Scream 1", "scream1", true));
+        audios.add(new AudioModel(4, "See You", "see_you", true));
 
         audios.addAll(getStoredAudios());
         return audios;

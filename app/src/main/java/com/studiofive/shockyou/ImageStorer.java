@@ -51,6 +51,9 @@ public class ImageStorer {
         assetImages.add(new ImageModel(0, "bust_1", true));
         assetImages.add(new ImageModel(1, "bust_2", true));
         assetImages.add(new ImageModel(2, "man_1", true));
+        assetImages.add(new ImageModel(3, "clown", true));
+        assetImages.add(new ImageModel(4, "doll", true));
+        assetImages.add(new ImageModel(5, "saw", true));
 
         assetImages.addAll(getStoredImages());
         return assetImages;
