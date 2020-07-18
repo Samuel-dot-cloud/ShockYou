@@ -61,6 +61,7 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            imageView = itemView.findViewById(R.id.gridImageView);
         }
     }
 
