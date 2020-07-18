@@ -5,16 +5,20 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -23,7 +27,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -42,12 +48,23 @@ import es.dmoral.toasty.Toasty;
 public class MainActivity extends AppCompatActivity {
     @BindView(R.id.prankSurface)
     ConstraintLayout mPrankSurface;
+    @BindView(R.id.scareImageView)
+    ImageView imageView;
+    @BindView(R.id.audioTextView)
+    TextView audioTextView;
 
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
 
     AudioStorer audioStorer;
     ImageStorer imageStorer;
+
+    BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateUI();
+        }
+    };
 
 
     @Override
@@ -69,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
 
         audioStorer = new AudioStorer(this);
         imageStorer = new ImageStorer(this);
+
+        updateUI();
     }
 
     @Override
@@ -201,6 +220,37 @@ public class MainActivity extends AppCompatActivity {
         File outputFile = new File(outputDir, filename);
 
         return outputFile;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver(updateReceiver, new IntentFilter(ShockUtils.MEDIA_UPDATED_ACTION));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(updateReceiver);
+    }
+
+    private void updateUI(){
+        ImageModel imageModel = imageStorer.getSelectedImage();
+        Uri imgUri;
+
+        if (imageModel.isAsset()){
+            imgUri = ShockUtils.getDrawableUri(this, imageModel.imgFilename);
+        }else {
+            imgUri = Uri.fromFile(new File(imageModel.getImgFilename()));
+        }
+        //updates to current selected image.
+        Glide.with(this)
+                .load(imgUri)
+                .into(imageView);
+
+        // Audio text
+        AudioModel audio = audioStorer.getSelectedAudio();
+        audioTextView.setText(audio.getDescriptionMessage());
     }
 
     public void createNotification(){
